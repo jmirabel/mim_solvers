@@ -60,6 +60,7 @@ void CallbackVerbose::update_header(const std::string solver_type) {
     header_ += center_string("||(dx,du)||", columnwidth) + separator_;
     header_ += center_string("step", columnwidth) + separator_;
     header_ += center_string("KKT criteria", columnwidth) + separator_;
+    header_ += center_string("index KKT", columnwidth) + separator_;
     header_ += center_string("QP iters", columnwidth);
   } else if (solver_type == "SQP"){
     header_ += center_string("merit", columnwidth) + separator_;
@@ -102,6 +103,8 @@ void CallbackVerbose::operator()(crocoddyl::SolverAbstract& solver, std::string 
                     << "     ---- "  << separator_ << separator_;                                                  // No step
         std::cout << std::scientific << std::setprecision(precision_)
                     << solver_cast.get_KKT() << separator_ << separator_short_;                                              // KKT criteria
+        std::cout << std::fixed << std::setprecision(0) << separator_short_
+                    << solver_cast.get_KKT_index() << separator_;  
         std::cout << std::fixed << std::setprecision(0)
                     << "    -----" << separator_;                                                       // No QP iters     
         }else{
@@ -119,6 +122,8 @@ void CallbackVerbose::operator()(crocoddyl::SolverAbstract& solver, std::string 
                     << solver_cast.get_steplength() << separator_  << separator_;                                       // step
         std::cout << std::scientific << std::setprecision(precision_)
                     << solver_cast.get_KKT() << separator_ << separator_ << separator_short_;                                              // KKT criteria
+        std::cout << std::fixed << std::setprecision(0) << separator_short_
+                    << solver_cast.get_KKT_index() << separator_;  
         std::cout << std::fixed << std::setprecision(0) << separator_short_
                     << solver_cast.get_qp_iters() << separator_;                                         // QP iters                            
       

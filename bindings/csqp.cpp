@@ -107,6 +107,7 @@ void exposeSolverCSQP() {
                     "Number of QP iterations")
       .add_property("KKT", bp::make_function(&SolverCSQP::get_KKT),
                     "KKT residual norm")
+      .add_property("KKT_index", bp::make_function(&SolverCSQP::get_KKT_index))
       .add_property("merit", bp::make_function(&SolverCSQP::get_merit),
                     "Merit function value")
                           

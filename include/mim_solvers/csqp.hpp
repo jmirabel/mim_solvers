@@ -134,6 +134,7 @@ class SolverCSQP : public SolverDDP {
 //   const std::vector<boost::shared_ptr<ConstraintModelAbstract>>& get_constraints() const { return cmodels_; };
 
   double get_KKT() const { return KKT_; };
+  int get_KKT_index() const { return i_KKT_; };
   double get_gap_norm() const { return gap_norm_; };
   double get_constraint_norm() const { return constraint_norm_; };
   double get_qp_iters() const { return qp_iters_; };
@@ -276,6 +277,7 @@ class SolverCSQP : public SolverDDP {
   double equality_qp_initial_guess_ = true;                   //!< warm-start the QP with unconstrained solution
   std::size_t filter_size_ = 1;                               //!< Filter size for line-search (do not change the default value !)
   double KKT_ = std::numeric_limits<double>::infinity();      //!< KKT conditions residual
+  int i_KKT_ = -1;
 
  private:
   double th_acceptnegstep_;                                   //!< Threshold used for accepting step along ascent direction

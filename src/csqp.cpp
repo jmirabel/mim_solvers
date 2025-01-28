@@ -582,8 +582,17 @@ void SolverCSQP::apply_rho_update(double rho_sparse_tmp_){
   STOP_PROFILER("SolverCSQP::apply_rho_update");
 }
 
+template<typename T>
+void update_max(T& currentMax, const T& next, int& indexMax, const int& nextIndex) {
+  if (currentMax >= next) return;
+  currentMax = next;
+  indexMax = nextIndex;
+}
+
 void SolverCSQP::checkKKTConditions(){
   KKT_ = 0.;
+  i_KKT_ = -1;
+  int cur_index = 0;
   const std::size_t T = problem_->get_T();
   x_grad_norm_ = 0; 
   u_grad_norm_ = 0;
@@ -602,11 +611,11 @@ void SolverCSQP::checkKKTConditions(){
     if (t > 0){
       tmp_vec_x_.noalias() += d->Gx.transpose() * y_[t];
     }
-    KKT_ = std::max(KKT_, tmp_vec_x_.lpNorm<Eigen::Infinity>());
+    update_max(KKT_, tmp_vec_x_.lpNorm<Eigen::Infinity>(), i_KKT_, cur_index++);
     tmp_vec_u_[t] = d->Lu;
     tmp_vec_u_[t].noalias() += d->Fu.transpose() * lag_mul_[t+1];
     tmp_vec_u_[t].noalias() += d->Gu.transpose() * y_[t];
-    KKT_ = std::max(KKT_, tmp_vec_u_[t].lpNorm<Eigen::Infinity>());
+    update_max(KKT_, tmp_vec_u_[t].lpNorm<Eigen::Infinity>(), i_KKT_, cur_index++);
     fs_flat_.segment(t*ndx, ndx) = fs_[t];      
     x_grad_norm_ += dxtilde_[t].lpNorm<1>(); 
     u_grad_norm_ += dutilde_[t].lpNorm<1>();
@@ -617,9 +626,9 @@ void SolverCSQP::checkKKTConditions(){
   tmp_vec_x_ = d_ter->Lx;
   tmp_vec_x_ -= lag_mul_.back();
   tmp_vec_x_.noalias() += d_ter->Gx.transpose() * y_.back();
-  KKT_ = std::max(KKT_, tmp_vec_x_.lpNorm<Eigen::Infinity>());
-  KKT_ = std::max(KKT_, fs_flat_.lpNorm<Eigen::Infinity>());
-  KKT_ = std::max(KKT_, constraint_norm_);
+  update_max(KKT_, tmp_vec_x_.lpNorm<Eigen::Infinity>(), i_KKT_, cur_index++);
+  update_max(KKT_, fs_flat_.lpNorm<Eigen::Infinity>(), i_KKT_, cur_index++);
+  update_max(KKT_, constraint_norm_, i_KKT_, cur_index++);
   x_grad_norm_ += dxtilde_.back().lpNorm<1>(); 
   x_grad_norm_ = x_grad_norm_/(T+1);
   u_grad_norm_ = u_grad_norm_/T; 
